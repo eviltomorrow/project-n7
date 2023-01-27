@@ -123,9 +123,9 @@ func (g *GRPC) GetMetadata(req *wrapperspb.StringValue, resp pb.Collector_GetMet
 			break
 		}
 		offset += limit
-		if len(metadata) != 0 {
-			lastID = metadata[len(metadata)-1].ObjectID
-		}
+		// if len(metadata) >= 2 {
+		// 	lastID = metadata[len(metadata)-2].ObjectID
+		// }
 	}
 	return nil
 }

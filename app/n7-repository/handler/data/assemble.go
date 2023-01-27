@@ -15,7 +15,7 @@ var (
 	ErrNoData = errors.New("no data")
 )
 
-func AssembleQuoteDay(data *model.Metadata, date time.Time) (*db.Quote, error) {
+func AssembleQuoteDay(data *model.Metadata, date time.Time) (*model.Quote, error) {
 	latest, err := db.QuoteWithSelectManyLatest(mysql.DB, db.Day, data.Code, data.Date, 1, timeout)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func AssembleQuoteDay(data *model.Metadata, date time.Time) (*db.Quote, error) {
 		xd = data.YesterdayClosed / latest[0].Close
 	}
 
-	quote := &db.Quote{
+	quote := &model.Quote{
 		Code:            data.Code,
 		Open:            data.Open,
 		Close:           data.Latest,
@@ -43,7 +43,7 @@ func AssembleQuoteDay(data *model.Metadata, date time.Time) (*db.Quote, error) {
 	return quote, nil
 }
 
-func AssembleQuoteWeek(code string, date time.Time) (*db.Quote, error) {
+func AssembleQuoteWeek(code string, date time.Time) (*model.Quote, error) {
 	var (
 		begin = date.AddDate(0, 0, -5).Format("2006-01-02")
 		end   = date.Format("2006-01-02")
@@ -77,7 +77,7 @@ func AssembleQuoteWeek(code string, date time.Time) (*db.Quote, error) {
 		}
 	}
 
-	var week = &db.Quote{
+	var week = &model.Quote{
 		Code:            first.Code,
 		Open:            first.Open,
 		Close:           last.Close,

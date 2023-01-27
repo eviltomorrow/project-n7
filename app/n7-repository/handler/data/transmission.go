@@ -18,15 +18,15 @@ func TransmissionMetadata(date time.Time, pipe chan *model.Metadata) (int64, int
 	)
 
 	var (
-		stocks = make([]*db.Stock, 0, size)
-		days   = make([]*db.Quote, 0, size)
+		stocks = make([]*model.Stock, 0, size)
+		days   = make([]*model.Quote, 0, size)
 	)
 	for md := range pipe {
 		if md == nil {
 			continue
 		}
 
-		stocks = append(stocks, &db.Stock{
+		stocks = append(stocks, &model.Stock{
 			Code:            md.Code,
 			Name:            md.Name,
 			Suspend:         md.Suspend,
@@ -77,7 +77,7 @@ func TransmissionMetadata(date time.Time, pipe chan *model.Metadata) (int64, int
 				return affectedS, affectedD, affectedW, err
 			}
 
-			var weeks = make([]*db.Quote, 0, len(stocks))
+			var weeks = make([]*model.Quote, 0, len(stocks))
 			for _, stock := range stocks {
 				week, err := AssembleQuoteWeek(stock.Code, date)
 				if err != nil && err != ErrNoData {

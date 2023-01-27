@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/eviltomorrow/project-n7/app/n7-repository/handler/db"
+	"github.com/eviltomorrow/project-n7/lib/model"
 	"github.com/eviltomorrow/project-n7/lib/mysql"
 )
 
 var (
-	timeout = 10 * time.Second
+	timeout = 30 * time.Second
 )
 
-func StoreStock(data []*db.Stock) (int64, error) {
+func StoreStock(data []*model.Stock) (int64, error) {
 	if len(data) == 0 {
 		return 0, nil
 	}
@@ -33,7 +34,7 @@ func StoreStock(data []*db.Stock) (int64, error) {
 	return affected, nil
 }
 
-func StoreQuote(data []*db.Quote, mode string, date string) (int64, error) {
+func StoreQuote(data []*model.Quote, mode string, date string) (int64, error) {
 	if len(data) == 0 {
 		return 0, nil
 	}
