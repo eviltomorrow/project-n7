@@ -49,7 +49,7 @@ compile:
 
 # build
 .PHONY: build
-build: export CGO_ENABLED=1
+build: export CGO_ENABLED=0
 build: build_collector build_email build_repository
 	
 
@@ -59,7 +59,7 @@ build_repository:
 	@mkdir -p bin/n7-repository/etc
 	@cp -p app/n7-repository/global.conf bin/n7-repository/etc
 	@echo "$(CGREEN)=> Building binary(n7-repository)...$(CEND)"
-	go build -race ${LDFLAGS} ${GCFLAGS} -o bin/n7-repository/bin/n7-repository app/n7-repository/main.go
+	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-repository/bin/n7-repository app/n7-repository/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
 .PHONY: build_collector
@@ -68,7 +68,7 @@ build_collector:
 	@mkdir -p bin/n7-collector/etc
 	@cp -p app/n7-collector/global.conf bin/n7-collector/etc
 	@echo "$(CGREEN)=> Building binary(n7-collector)...$(CEND)"
-	go build -race ${LDFLAGS} ${GCFLAGS} -o bin/n7-collector/bin/n7-collector app/n7-collector/main.go
+	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-collector/bin/n7-collector app/n7-collector/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
 .PHONY: build_email
@@ -78,7 +78,7 @@ build_email:
 	@cp -p app/n7-email/global.conf bin/n7-email/etc
 	@cp -p app/n7-email/smtp.json bin/n7-email/etc
 	@echo "$(CGREEN)=> Building binary(n7-email)...$(CEND)"
-	go build -race ${LDFLAGS} ${GCFLAGS} -o bin/n7-email/bin/n7-email app/n7-email/main.go
+	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-email/bin/n7-email app/n7-email/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
 # clear
