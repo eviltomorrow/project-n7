@@ -50,7 +50,7 @@ compile:
 # build
 .PHONY: build
 build: export CGO_ENABLED=0
-build: build_collector build_email build_repository
+build: build_collector build_email build_repository build_finder
 	
 
 .PHONY: build_repository
@@ -79,6 +79,16 @@ build_email:
 	@cp -p app/n7-email/smtp.json bin/n7-email/etc
 	@echo "$(CGREEN)=> Building binary(n7-email)...$(CEND)"
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-email/bin/n7-email app/n7-email/main.go
+	@echo "$(CGREEN)=> Build Success!$(CEND)"
+
+
+.PHONY: build_finder
+build_finder:
+	@rm -rf bin/n7-finder/*
+	@mkdir -p bin/n7-finder/etc
+	@cp -p app/n7-finder/global.conf bin/n7-finder/etc
+	@echo "$(CGREEN)=> Building binary(n7-finder)...$(CEND)"
+	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-finder/bin/n7-finder app/n7-finder/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
 # clear

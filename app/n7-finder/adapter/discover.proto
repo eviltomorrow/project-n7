@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "./;pb";
+package finder;
+
+service Discover {
+    rpc LookupTransaction(google.protobuf.Empty) returns (Stock){}
+}
+
+message Stock {
+    string code = 1;
+    string name = 2;
+    string date = 3;
+    string desc = 4;
+}

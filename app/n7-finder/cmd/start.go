@@ -4,24 +4,18 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"strconv"
-	"strings"
 
-	"github.com/eviltomorrow/project-n7/app/n7-collector/conf"
-	"github.com/eviltomorrow/project-n7/app/n7-collector/handler/crontab"
-	"github.com/eviltomorrow/project-n7/app/n7-collector/handler/sync"
-	"github.com/eviltomorrow/project-n7/app/n7-collector/server"
+	"github.com/eviltomorrow/project-n7/app/n7-finder/conf"
+	"github.com/eviltomorrow/project-n7/app/n7-finder/server"
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/fs"
 	"github.com/eviltomorrow/project-n7/lib/grpc/lb"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
-	"github.com/eviltomorrow/project-n7/lib/mongodb"
 	"github.com/eviltomorrow/project-n7/lib/pid"
 	"github.com/eviltomorrow/project-n7/lib/procutil"
 	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
 	"github.com/eviltomorrow/project-n7/lib/self"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
-	"github.com/robfig/cron/v3"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/resolver"
@@ -30,10 +24,7 @@ import (
 var workflowsFunc = []func() error{
 	setRuntime,
 	loadConfig,
-	printCfg,
 	setGlobal,
-	runDB,
-	runCron,
 	runServer,
 	buildPidFile,
 	rewritePaniclog,
@@ -82,25 +73,16 @@ func loadConfig() error {
 	}
 	self.RegisterClearFuncs(closeFuncs...)
 
+	zlog.Info("Load config file complete", zap.String("conf", cfg.String()))
 	return nil
 }
 
 func setGlobal() error {
+	etcd.Endpoints = cfg.Etcd.Endpoints
 	middleware.LogDir = filepath.Join(runtimeutil.ExecutableDir, "../log")
+
 	server.ListenHost = cfg.Server.Host
 	server.Port = cfg.Server.Port
-	etcd.Endpoints = cfg.Etcd.Endpoints
-	mongodb.DSN = cfg.MongoDB.DSN
-	crontab.Source = cfg.Watcher.Source
-	sync.CodeList = cfg.Watcher.CodeList
-	if strings.Count(cfg.Watcher.RandomWait, ",") == 1 {
-		var attrs = strings.Split(cfg.Watcher.RandomWait, ",")
-		v1, _ := strconv.Atoi(attrs[0])
-		v2, _ := strconv.Atoi(attrs[1])
-		if v1 < v2 && v1 > 0 && v2 < 100 {
-			sync.RandomWait = [2]int{v1, v2}
-		}
-	}
 	return nil
 }
 
@@ -113,15 +95,6 @@ func setRuntime() error {
 			return fmt.Errorf("create dir failure, nest error: %v", err)
 		}
 	}
-	return nil
-}
-
-func runDB() error {
-	if err := mongodb.Build(); err != nil {
-		return err
-	}
-	self.RegisterClearFuncs(mongodb.Close)
-
 	return nil
 }
 
@@ -145,26 +118,8 @@ func runServer() error {
 		return err
 	}
 	self.RegisterClearFuncs(g.Shutdown)
-	zlog.Info("Startup GRPC server success", zap.String("host", server.ListenHost), zap.Int("port", server.Port))
-	return nil
-}
 
-func runCron() error {
-	var c = cron.New()
-	_, err := c.AddFunc(cfg.Watcher.Crontab, func() {
-		if err := crontab.EveryWeekDay(); err != nil {
-			zlog.Error("Crontab run EveryWeekDay failure", zap.Error(err))
-		}
-	})
-	if err != nil {
-		return err
-	}
-	c.Start()
-
-	self.RegisterClearFuncs(func() error {
-		c.Stop()
-		return nil
-	})
+	zlog.Info("Startup GRPC Server complete", zap.String("addrs", fmt.Sprintf("%s:%d", server.ListenHost, server.Port)))
 	return nil
 }
 
@@ -182,10 +137,5 @@ func buildPidFile() error {
 		return err
 	}
 	self.RegisterClearFuncs(closeFunc)
-	return nil
-}
-
-func printCfg() error {
-	zlog.Info("Load config success", zap.String("config", cfg.String()))
 	return nil
 }
