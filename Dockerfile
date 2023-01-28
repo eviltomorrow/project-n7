@@ -15,3 +15,4 @@ WORKDIR /app
 COPY --from builder ["/project-n7/bin/${APPNAME}","./bin/"]
 COPY --from builder ["/project-n7/app/${APPNAME}/etc","./etc/"]
 
+ENTRYPOINT ["./bin/${APPNAME}", "start"]

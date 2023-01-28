@@ -17,7 +17,7 @@ services:
     ports:
       - 27017:27017
     networks:
-      - n7
+      - n7-net
 
   mysql:
     environment:
@@ -35,7 +35,7 @@ services:
       - 3306:3306
     privileged: true
     networks:
-      - n7
+      - n7-net
 
   etcd:
     environment:               
@@ -51,8 +51,8 @@ services:
       - "2379:2379"
       - "2380:2380"
     networks:
-      - n7
+      - n7-net
 
 networks:
-  n7:
+  n7-net:
     driver: bridge

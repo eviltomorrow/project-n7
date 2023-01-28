@@ -55,7 +55,7 @@ build: build_collector build_email build_repository build_finder
 build_repository:
 	@rm -rf bin/n7-repository/*
 	@mkdir -p bin/n7-repository/etc
-	@cp -p app/n7-repository/global.conf bin/n7-repository/etc
+	@cp -rp app/n7-repository/etc bin/n7-repository/
 	@echo "$(CGREEN)=> Building binary(n7-repository)...$(CEND)"
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-repository/bin/n7-repository app/n7-repository/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
@@ -64,7 +64,7 @@ build_repository:
 build_collector:
 	@rm -rf bin/n7-collector/*
 	@mkdir -p bin/n7-collector/etc
-	@cp -p app/n7-collector/global.conf bin/n7-collector/etc
+	@cp -rp app/n7-collector/etc bin/n7-collector/
 	@echo "$(CGREEN)=> Building binary(n7-collector)...$(CEND)"
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-collector/bin/n7-collector app/n7-collector/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
@@ -73,8 +73,7 @@ build_collector:
 build_email:
 	@rm -rf bin/n7-email/*
 	@mkdir -p bin/n7-email/etc
-	@cp -p app/n7-email/global.conf bin/n7-email/etc
-	@cp -p app/n7-email/smtp.json bin/n7-email/etc
+	@cp -rp app/n7-email/etc bin/n7-email/
 	@echo "$(CGREEN)=> Building binary(n7-email)...$(CEND)"
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-email/bin/n7-email app/n7-email/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
@@ -84,7 +83,7 @@ build_email:
 build_finder:
 	@rm -rf bin/n7-finder/*
 	@mkdir -p bin/n7-finder/etc
-	@cp -p app/n7-finder/global.conf bin/n7-finder/etc
+	@cp -rp app/n7-finder/etc/ bin/n7-finder/
 	@echo "$(CGREEN)=> Building binary(n7-finder)...$(CEND)"
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-finder/bin/n7-finder app/n7-finder/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
