@@ -1,0 +1,58 @@
+version: '3'
+services:
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - LANG=C.UTF-8
+    volumes:
+      - $PWD/mongo/conf:/etc/mongo
+      - $PWD/mongo/db:/var/lib/mongo
+      - $PWD/mongo/logs:/var/log/mongo
+      - /etc/localtime:/etc/localtime
+      - /usr/share/zoneinfo:/usr/share/zoneinfo\
+    command: ["--auth","--config","/etc/mongo/mongod.conf"]
+    image: mongo
+    container_name: mongo
+    ports:
+      - 27017:27017
+    networks:
+      - n7
+
+  mysql:
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - $PWD/mysql/conf:/etc/mysql/conf.d
+      - $PWD/mysql/db:/var/lib/mysql
+      - $PWD/mysql/logs:/var/log/mysql
+      - /run/mysql:/var/run/mysqld
+      - /usr/share/zoneinfo:/usr/share/zoneinfo
+      - /etc/localtime:/etc/localtime
+    image: mysql
+    container_name: mysql
+    ports:
+      - 3306:3306
+    privileged: true
+    networks:
+      - n7
+
+  etcd:
+    environment:               
+      - ALLOW_NONE_AUTHENTICATION=yes                                   
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379          
+      - ETCDCTL_API=3                                            
+    volumes:
+      - $PWD/etcd:/etcd-data                       
+      - /etc/localtime:/etc/localtime
+    image: bitnami/etcd   
+    container_name: etcd                
+    ports:                   
+      - "2379:2379"
+      - "2380:2380"
+    networks:
+      - n7
+
+networks:
+  n7:
+    driver: bridge
