@@ -7,11 +7,9 @@ ifeq "$(GOPATH)" ""
 endif
 PATH := ${GOPATH}/bin:$(PATH)
 GCFLAGS=-gcflags "all=-trimpath=${GOPATH}"
-GITTAG := $(shell git describe --tags --always)
-GITSHA := $(shell git rev-parse --short HEAD)
-GITBRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+GITSHA := $(shell git rev-parse HEAD)
 BUILDTIME=`date +%FT%T%z`
-LDFLAGS=-ldflags "-X main.MainVersion=${MAINVERSION} -X main.GitSha=${GITSHA} -X main.GitTag=${GITTAG} -X main.GitBranch=${GITBRANCH} -X main.BuildTime=${BUILDTIME} -s -w"
+LDFLAGS=-ldflags "-X main.MainVersion=${MAINVERSION} -X main.GitSha=${GITSHA} -X main.BuildTime=${BUILDTIME} -s -w"
 
 # colors compatible setting
 CRED:=$(shell tput setaf 1 2>/dev/null)

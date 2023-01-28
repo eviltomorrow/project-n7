@@ -14,4 +14,4 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 bin/n7-*
-app/n7-email/smtp.json
+app/n7-email/etc/smtp.json

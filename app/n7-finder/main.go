@@ -22,8 +22,6 @@ var (
 func init() {
 	buildinfo.MainVersion = MainVersion
 	buildinfo.GitSha = GitSha
-	buildinfo.GitTag = GitTag
-	buildinfo.GitBranch = GitBranch
 	buildinfo.BuildTime = BuildTime
 }
 
