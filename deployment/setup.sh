@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # create dir
-mkdir -p $(pwd)/mongo/{db,conf,logs}
+mkdir -p $(pwd)/mongo/{db,conf,logs,init}
 chmod 777 $(pwd)/mongo/db $(pwd)/mongo/logs
 
-mkdir -p $(pwd)/mysql/{db,conf,logs}
+mkdir -p $(pwd)/mysql/{db,conf,logs,init}
 chmod 777 $(pwd)/mysql/db $(pwd)/mysql/logs
+
+mkdir -p $(pwd)/app/{n7-collector,n7-email,n7-repository,n7-finder}
 
 # mongodb.conf
 cat > $(pwd)/mongo/conf/mongod.conf <<EOF
@@ -55,6 +57,15 @@ net:
 #snmp:
 EOF
 
+# init_mongo.js
+cat > $(pwd)/mongo/init/init_mongo.js <<EOF
+db = db.getSiblingDB('n7');
+db.createUser({"user":"admin","pwd":"admin123","roles":[{"role":"dbOwner","db":"n7"}]});
+db.createCollection('metadata');
+db.metadata.createIndex({date: 1, code: 1},{background: true});
+EOF
+chmod a+x $(pwd)/mongo/init/init_mongo.js
+
 # my.cnf 
 cat > $(pwd)/mysql/conf/my.cnf <<EOF
 [client]
@@ -73,4 +84,11 @@ max_connections = 1000
 log_error = /var/log/mysql/error.log
 socket = /var/run/mysqld/mysql.sock
 sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,PIPES_AS_CONCAT,ANSI_QUOTES'
+EOF
+
+# init.sql
+cat > $(pwd)/mysql/init/init_mysql.sql <<EOF
+CREATE USER 'admin'@'%' IDENTIFIED BY 'admin123';
+CREATE DATABASE n7_repository DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL ON n7_repository.* TO 'admin'@'%';
 EOF

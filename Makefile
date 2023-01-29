@@ -48,29 +48,31 @@ compile:
 # build
 .PHONY: build
 build: export CGO_ENABLED=0
-build: build_collector build_email build_repository build_finder
-	
-
-.PHONY: build_repository
-build_repository:
-	@rm -rf bin/n7-repository/*
-	@mkdir -p bin/n7-repository/etc
-	@cp -rp app/n7-repository/etc bin/n7-repository/
-	@echo "$(CGREEN)=> Building binary(n7-repository)...$(CEND)"
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-repository/bin/n7-repository app/n7-repository/main.go
+build: 
+ifeq (${app},)
+	@bash build/app_build.sh ${LDFLAGS} ${GCFLAGS}
+else
+	@rm -rf bin/${app}/*
+	@mkdir -p bin/${app}/etc
+	@cp -rp app/${app}/etc bin/${app}/
+	@echo "$(CGREEN)=> Building binary(${app})...$(CEND)"
+	go build ${LDFLAGS} ${GCFLAGS} -o bin/${app}/bin/${app} app/${app}/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
+endif
+
+# build
+.PHONY: docker
+docker: 
+ifeq (${app},)
+	@bash build/docker_build.sh ${MAINVERSION} ${GITSHA} ${BUILDTIME}
+else
+	docker build --target prod -t ${app} . --build-arg APPNAME=${app} --build-arg MAINVERSION=${MAINVERSION} --build-arg GITSHA=${GITSHA} --build-arg BUILDTIME=${BUILDTIME}
+endif
 
 # clear
 .PHONY: clear
 clear:
 	@rm -rf bin/n7-*
-
-# Package all
-.PHONY: package
-package:
-	@echo "$(CGREEN)=> Package project-n7 ...$(CEND)"
-	@bash build/package.sh
-	@echo "$(CGREEN)=> Package project-n7 complete$(CEND)"
 
 # Go mod tidy
 .PHONY: mod
