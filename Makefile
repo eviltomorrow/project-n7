@@ -60,34 +60,6 @@ build_repository:
 	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-repository/bin/n7-repository app/n7-repository/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
-.PHONY: build_collector
-build_collector:
-	@rm -rf bin/n7-collector/*
-	@mkdir -p bin/n7-collector/etc
-	@cp -rp app/n7-collector/etc bin/n7-collector/
-	@echo "$(CGREEN)=> Building binary(n7-collector)...$(CEND)"
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-collector/bin/n7-collector app/n7-collector/main.go
-	@echo "$(CGREEN)=> Build Success!$(CEND)"
-
-.PHONY: build_email
-build_email:
-	@rm -rf bin/n7-email/*
-	@mkdir -p bin/n7-email/etc
-	@cp -rp app/n7-email/etc bin/n7-email/
-	@echo "$(CGREEN)=> Building binary(n7-email)...$(CEND)"
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-email/bin/n7-email app/n7-email/main.go
-	@echo "$(CGREEN)=> Build Success!$(CEND)"
-
-
-.PHONY: build_finder
-build_finder:
-	@rm -rf bin/n7-finder/*
-	@mkdir -p bin/n7-finder/etc
-	@cp -rp app/n7-finder/etc/ bin/n7-finder/
-	@echo "$(CGREEN)=> Building binary(n7-finder)...$(CEND)"
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/n7-finder/bin/n7-finder app/n7-finder/main.go
-	@echo "$(CGREEN)=> Build Success!$(CEND)"
-
 # clear
 .PHONY: clear
 clear:
@@ -100,10 +72,16 @@ package:
 	@bash build/package.sh
 	@echo "$(CGREEN)=> Package project-n7 complete$(CEND)"
 
-# Go mod
+# Go mod tidy
 .PHONY: mod
 mod:export GO111MODULE=on
 mod:
 	@echo "$(CGREEN)=> go mod tidy...$(CEND)"
 	@go mod tidy
 
+# Go mod vendor
+.PHONY: vendor
+vendor:export GO111MODULE=on
+vendor:
+	@echo "$(CGREEN)=> go mod vendor...$(CEND)"
+	@go mod vendors
