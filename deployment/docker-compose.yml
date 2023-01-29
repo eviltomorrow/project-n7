@@ -28,7 +28,7 @@ services:
       - $PWD/data/mysql/db:/var/lib/mysql/
       - $PWD/data/mysql/logs:/var/log/mysql/
       - $PWD/data/mysql/init:/docker-entrypoint-initdb.d/
-      - /run/data/mysql:/var/run/mysqld/
+      - /run/mysql:/var/run/mysqld/
       - /usr/share/zoneinfo:/usr/share/zoneinfo/
       - /etc/localtime:/etc/localtime
     image: mysql

@@ -82,7 +82,7 @@ func (g *GRPC) Startup() error {
 	}
 
 	reflection.Register(g.server)
-	// pb.RegisterEmailServer(g.server, g)
+	// pb.RegisterDiscoverServer(g.server, g)
 	go func() {
 		if err := g.server.Serve(listen); err != nil {
 			log.Fatalf("Startup grpc server failure, nest error: %v", err)
