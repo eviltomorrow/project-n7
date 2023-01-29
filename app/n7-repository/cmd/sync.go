@@ -17,7 +17,7 @@ var SyncCommand = &cli.Command{
 	Name:  "sync",
 	Usage: "sync data from collector",
 	Flags: []cli.Flag{
-		&cli.StringFlag{Name: "date", Value: "", Usage: "sync data from collector with specify date", Aliases: []string{"d"}},
+		&cli.StringFlag{Name: "date", Value: "", Required: true, Usage: "sync data from collector with specify date", Aliases: []string{"d"}},
 	},
 	Action: func(ctx *cli.Context) error {
 		var begin = time.Now()

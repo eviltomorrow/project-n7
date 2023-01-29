@@ -6,12 +6,12 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=root
       - LANG=C.UTF-8
     volumes:
-      - $PWD/mongo/conf:/etc/mongo
-      - $PWD/mongo/db:/var/lib/mongo
-      - $PWD/mongo/logs:/var/log/mongo
-      - $PWD/mongo/init/init_mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - $PWD/data/mongo/conf:/etc/mongo/
+      - $PWD/data/mongo/db:/var/lib/mongo/
+      - $PWD/data/mongo/logs:/var/log/mongo/
+      - $PWD/data/mongo/init/init_mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
       - /etc/localtime:/etc/localtime
-      - /usr/share/zoneinfo:/usr/share/zoneinfo
+      - /usr/share/zoneinfo:/usr/share/zoneinfo/
     command: ["--auth","--config","/etc/mongo/mongod.conf"]
     image: mongo
     container_name: mongo
@@ -24,11 +24,11 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
     volumes:
-      - $PWD/mysql/conf:/etc/mysql/conf.d
-      - $PWD/mysql/db:/var/lib/mysql
-      - $PWD/mysql/logs:/var/log/mysql
-      - $PWD/mysql/init:/docker-entrypoint-initdb.d/
-      - /run/mysql:/var/run/mysqld
+      - $PWD/data/mysql/conf:/etc/mysql/conf.d/
+      - $PWD/data/mysql/db:/var/lib/mysql/
+      - $PWD/data/mysql/logs:/var/log/mysql/
+      - $PWD/data/mysql/init:/docker-entrypoint-initdb.d/
+      - /run/data/mysql:/var/run/mysqld/
       - /usr/share/zoneinfo:/usr/share/zoneinfo/
       - /etc/localtime:/etc/localtime
     image: mysql
@@ -45,8 +45,8 @@ services:
       - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379          
       - ETCDCTL_API=3                                            
     volumes:
-      - $PWD/etcd:/etcd-data                       
-      - /etc/localtime:/etc/localtime
+      - $PWD/data/etcd:/etcd-data/                       
+      - /etc/localtime:/etc/localtime/
     image: bitnami/etcd   
     container_name: etcd                
     ports:                   
@@ -57,7 +57,7 @@ services:
 
   n7-collector:                                         
     volumes:
-      - $PWD/app/n7-collector:/app/log                       
+      - $PWD/logs/n7-collector:/app/log/                      
       - /etc/localtime:/etc/localtime
     image: n7-collector
     container_name: n7-collector                
@@ -72,7 +72,7 @@ services:
 
   n7-email:                                         
     volumes:
-      - $PWD/app/n7-email:/app/log                       
+      - $PWD/logs/n7-email:/app/log /                      
       - /etc/localtime:/etc/localtime
     image: n7-email
     container_name: n7-email                
@@ -87,7 +87,7 @@ services:
 
   n7-repository:                                         
     volumes:
-      - $PWD/app/n7-repository:/app/log                       
+      - $PWD/logs/n7-repository:/app/log/                       
       - /etc/localtime:/etc/localtime
     image: n7-repository
     container_name: n7-repository                

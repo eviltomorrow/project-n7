@@ -1,16 +1,19 @@
 #!/bin/bash
 
 # create dir
-mkdir -p $(pwd)/mongo/{db,conf,logs,init}
-chmod 777 $(pwd)/mongo/db $(pwd)/mongo/logs
+mkdir -p $(pwd)/data/mongo/{db,conf,logs,init}
+chmod 777 $(pwd)/data/mongo/db $(pwd)/data/mongo/logs
 
-mkdir -p $(pwd)/mysql/{db,conf,logs,init}
-chmod 777 $(pwd)/mysql/db $(pwd)/mysql/logs
+mkdir -p $(pwd)/data/mysql/{db,conf,logs,init}
+chmod 777 $(pwd)/data/mysql/db $(pwd)/data/mysql/logs
 
-mkdir -p $(pwd)/app/{n7-collector,n7-email,n7-repository,n7-finder}
+mkdir -p $(pwd)/data/etcd
+chmod 777 $(pwd)/data/etcd
+
+mkdir -p $(pwd)/logs/{n7-collector,n7-email,n7-repository,n7-finder}
 
 # mongodb.conf
-cat > $(pwd)/mongo/conf/mongod.conf <<EOF
+cat > $(pwd)/data/mongo/conf/mongod.conf <<EOF
 # mongod.conf
 
 # for documentation of all options, see:
@@ -58,16 +61,16 @@ net:
 EOF
 
 # init_mongo.js
-cat > $(pwd)/mongo/init/init_mongo.js <<EOF
+cat > $(pwd)/data/mongo/init/init_mongo.js <<EOF
 db = db.getSiblingDB('n7');
 db.createUser({"user":"admin","pwd":"admin123","roles":[{"role":"dbOwner","db":"n7"}]});
 db.createCollection('metadata');
 db.metadata.createIndex({date: 1, code: 1},{background: true});
 EOF
-chmod a+x $(pwd)/mongo/init/init_mongo.js
+chmod a+x $(pwd)/data/mongo/init/init_mongo.js
 
 # my.cnf 
-cat > $(pwd)/mysql/conf/my.cnf <<EOF
+cat > $(pwd)/data/mysql/conf/my.cnf <<EOF
 [client]
 port = 3306
 default-character-set = utf8
@@ -87,8 +90,9 @@ sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_
 EOF
 
 # init.sql
-cat > $(pwd)/mysql/init/init_mysql.sql <<EOF
+cat > $(pwd)/data/mysql/init/init_mysql.sql <<EOF
 CREATE USER 'admin'@'%' IDENTIFIED BY 'admin123';
 CREATE DATABASE n7_repository DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 GRANT ALL ON n7_repository.* TO 'admin'@'%';
+
 EOF

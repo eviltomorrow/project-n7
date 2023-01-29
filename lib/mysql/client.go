@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -14,17 +15,40 @@ var (
 	MinOpen int = 5
 	MaxOpen int = 10
 	DB      *sql.DB
+
+	RetryTimes = 3
+	Period     = 10 * time.Second
 )
 
-var DefaultConnectTimeout = 10 * time.Second
+var DefaultConnectTimeout = 5 * time.Second
 
 // Build build mysql
 func Build() error {
-	pool, err := buildMySQL(DSN)
-	if err != nil {
-		return err
+	var (
+		pool *sql.DB
+		err  error
+
+		i = 1
+	)
+	for {
+		if i > RetryTimes {
+			if err != nil {
+				return err
+			}
+			return fmt.Errorf("panic: connect mysql failure, err is nil?")
+		}
+		pool, err = buildMySQL(DSN)
+		if err == nil {
+			break
+		}
+		if err != nil {
+			log.Printf("[W] Try to connect to MongoDB=>[Retry: %d], nest error: %v\r\n", i, err)
+		}
+		i++
+		time.Sleep(Period)
 	}
 	DB = pool
+
 	return nil
 }
 

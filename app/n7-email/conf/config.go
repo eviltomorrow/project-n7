@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	jsoniter "github.com/json-iterator/go"
 )
@@ -75,7 +76,7 @@ func SetupLogger(l Log) ([]func() error, error) {
 		Format:           l.Format,
 		DisableTimestamp: l.DisableTimestamp,
 		File: zlog.FileLogConfig{
-			Filename:   filepath.Join(l.Dir, "data.log"),
+			Filename:   filepath.Join(runtimeutil.ExecutableDir, filepath.Join(l.Dir, "data.log")),
 			MaxSize:    l.MaxSize,
 			MaxDays:    30,
 			MaxBackups: 30,
