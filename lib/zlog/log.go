@@ -20,10 +20,10 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var globalMu sync.Mutex
