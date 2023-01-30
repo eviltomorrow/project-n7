@@ -72,7 +72,7 @@ services:
 
   n7-email:                                         
     volumes:
-      - $PWD/logs/n7-email:/app/log /                      
+      - $PWD/logs/n7-email:/app/log/                      
       - /etc/localtime:/etc/localtime
     image: n7-email
     container_name: n7-email                
