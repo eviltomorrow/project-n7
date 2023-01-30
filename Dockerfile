@@ -1,4 +1,4 @@
-FROM golang AS builder
+FROM golang:latest AS builder
 
 WORKDIR /project-n7
 COPY [".", "./"]
