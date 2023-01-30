@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "./;pb";
 package finder;
 
-service Discover {
-    rpc LookupTransaction(google.protobuf.Empty) returns (Stock){}
+service Finder {
+    rpc LookupTransaction(google.protobuf.StringValue) returns (Stock){}
 }
 
 message Stock {
