@@ -74,8 +74,6 @@ endif
 clear:
 	@echo "$(CGREEN)=> Clear ./bin...$(CEND)"
 	@rm -rf bin/n7-*
-	@echo "$(CGREEN)=> Clear docker prune image$(CEND)"
-	@docker image prune
 
 # Go mod tidy
 .PHONY: mod
