@@ -87,4 +87,4 @@ mod:
 vendor:export GO111MODULE=on
 vendor:
 	@echo "$(CGREEN)=> go mod vendor...$(CEND)"
-	@go mod vendors
+	@go mod vendor
