@@ -28,7 +28,7 @@ services:
       - $PWD/data/mysql/db:/var/lib/mysql/
       - $PWD/data/mysql/logs:/var/log/mysql/
       - $PWD/data/mysql/init:/docker-entrypoint-initdb.d/
-      - /run/mysql:/var/run/mysqld/
+      - /run/mysqld:/run/mysqld/
       - /usr/share/zoneinfo:/usr/share/zoneinfo/
       - /etc/localtime:/etc/localtime
     image: mysql
@@ -59,8 +59,8 @@ services:
     volumes:
       - $PWD/logs/n7-collector:/app/log/                      
       - /etc/localtime:/etc/localtime
-    image: n7-collector
-    container_name: eviltomorrow/n7-collector                
+    image: eviltomorrow/n7-collector
+    container_name: n7-collector                
     ports:                   
       - "5270:5270"
     depends_on:
@@ -74,8 +74,8 @@ services:
     volumes:
       - $PWD/logs/n7-email:/app/log/                      
       - /etc/localtime:/etc/localtime
-    image: n7-email
-    container_name: eviltomorrow/n7-email                
+    image: eviltomorrow/n7-email
+    container_name: n7-email                
     ports:                   
       - "5271:5271"
     depends_on:
@@ -89,8 +89,8 @@ services:
     volumes:
       - $PWD/logs/n7-repository:/app/log/                       
       - /etc/localtime:/etc/localtime
-    image: n7-repository
-    container_name: eviltomorrow/n7-repository                
+    image: eviltomorrow/n7-repository
+    container_name: n7-repository                
     ports:                   
       - "5272:5272"
     depends_on:
