@@ -13,7 +13,7 @@ type Config struct {
 	ServiceName string `json:"service-name" toml:"service-name"`
 	Server      Server `json:"server" toml:"server"`
 	Etcd        Etcd   `json:"etcd" toml:"etcd"`
-	SmtpFile    string `json:"smtp-file" toml:"smtp-file"`
+	BotFile     string `json:"bot-file" toml:"bot-file"`
 
 	Log Log `json:"log" toml:"log"`
 }
@@ -48,11 +48,11 @@ type Log struct {
 }
 
 var DefaultGlobal = &Config{
-	ServiceName: "n7-email",
-	SmtpFile:    "../etc/smtp.json",
+	ServiceName: "n7-telegram-bot",
+	BotFile:     "../etc/telegram-bot.json",
 	Server: Server{
 		Host: "0.0.0.0",
-		Port: 5271,
+		Port: 5274,
 	},
 	Etcd: Etcd{
 		Endpoints: []string{
