@@ -19,86 +19,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// TelegramClient is the client API for Telegram service.
+// TelegramBotClient is the client API for TelegramBot service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TelegramClient interface {
+type TelegramBotClient interface {
 	Send(ctx context.Context, in *Chat, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 }
 
-type telegramClient struct {
+type telegramBotClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTelegramClient(cc grpc.ClientConnInterface) TelegramClient {
-	return &telegramClient{cc}
+func NewTelegramBotClient(cc grpc.ClientConnInterface) TelegramBotClient {
+	return &telegramBotClient{cc}
 }
 
-func (c *telegramClient) Send(ctx context.Context, in *Chat, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+func (c *telegramBotClient) Send(ctx context.Context, in *Chat, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/telegram.Telegram/Send", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/telegrambot.TelegramBot/Send", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// TelegramServer is the server API for Telegram service.
-// All implementations must embed UnimplementedTelegramServer
+// TelegramBotServer is the server API for TelegramBot service.
+// All implementations must embed UnimplementedTelegramBotServer
 // for forward compatibility
-type TelegramServer interface {
+type TelegramBotServer interface {
 	Send(context.Context, *Chat) (*wrapperspb.StringValue, error)
-	mustEmbedUnimplementedTelegramServer()
+	mustEmbedUnimplementedTelegramBotServer()
 }
 
-// UnimplementedTelegramServer must be embedded to have forward compatible implementations.
-type UnimplementedTelegramServer struct {
+// UnimplementedTelegramBotServer must be embedded to have forward compatible implementations.
+type UnimplementedTelegramBotServer struct {
 }
 
-func (UnimplementedTelegramServer) Send(context.Context, *Chat) (*wrapperspb.StringValue, error) {
+func (UnimplementedTelegramBotServer) Send(context.Context, *Chat) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
 }
-func (UnimplementedTelegramServer) mustEmbedUnimplementedTelegramServer() {}
+func (UnimplementedTelegramBotServer) mustEmbedUnimplementedTelegramBotServer() {}
 
-// UnsafeTelegramServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TelegramServer will
+// UnsafeTelegramBotServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to TelegramBotServer will
 // result in compilation errors.
-type UnsafeTelegramServer interface {
-	mustEmbedUnimplementedTelegramServer()
+type UnsafeTelegramBotServer interface {
+	mustEmbedUnimplementedTelegramBotServer()
 }
 
-func RegisterTelegramServer(s grpc.ServiceRegistrar, srv TelegramServer) {
-	s.RegisterService(&Telegram_ServiceDesc, srv)
+func RegisterTelegramBotServer(s grpc.ServiceRegistrar, srv TelegramBotServer) {
+	s.RegisterService(&TelegramBot_ServiceDesc, srv)
 }
 
-func _Telegram_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TelegramBot_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Chat)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TelegramServer).Send(ctx, in)
+		return srv.(TelegramBotServer).Send(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/telegram.Telegram/Send",
+		FullMethod: "/telegrambot.TelegramBot/Send",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TelegramServer).Send(ctx, req.(*Chat))
+		return srv.(TelegramBotServer).Send(ctx, req.(*Chat))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Telegram_ServiceDesc is the grpc.ServiceDesc for Telegram service.
+// TelegramBot_ServiceDesc is the grpc.ServiceDesc for TelegramBot service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Telegram_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "telegram.Telegram",
-	HandlerType: (*TelegramServer)(nil),
+var TelegramBot_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "telegrambot.TelegramBot",
+	HandlerType: (*TelegramBotServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Send",
-			Handler:    _Telegram_Send_Handler,
+			Handler:    _TelegramBot_Send_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,9 +3,9 @@ syntax = "proto3";
 import "google/protobuf/wrappers.proto";
 
 option go_package = "./;pb";
-package telegram;
+package telegrambot;
 
-service Telegram {
+service TelegramBot {
     rpc Send(Chat) returns (google.protobuf.StringValue){}
 }
 
