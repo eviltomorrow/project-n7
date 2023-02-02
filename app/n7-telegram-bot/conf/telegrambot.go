@@ -9,10 +9,9 @@ import (
 )
 
 type TelegramBot struct {
-	Token string `json:"token"`
-
-	Domain  string `json:"domain"`
-	WebHook string `json:"web-hook"`
+	DomainName  string `json:"domain-name"`
+	Pattern     string `json:"pattern"`
+	AccessToken string `json:"access-token"`
 }
 
 func (t *TelegramBot) String() string {

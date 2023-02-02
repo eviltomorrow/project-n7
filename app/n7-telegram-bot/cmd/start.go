@@ -5,8 +5,8 @@ import (
 	"log"
 	"path/filepath"
 
-	"github.com/eviltomorrow/project-n7/app/n7-email/conf"
-	"github.com/eviltomorrow/project-n7/app/n7-email/server"
+	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/conf"
+	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/server"
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/fs"
 	"github.com/eviltomorrow/project-n7/lib/grpc/lb"
@@ -99,7 +99,7 @@ func setRuntime() error {
 }
 
 func runServer() error {
-	smtp, err := conf.FindSMTP(filepath.Join(runtimeutil.ExecutableDir, cfg.SmtpFile))
+	tb, err := conf.FindTelegramBot(filepath.Join(runtimeutil.ExecutableDir, cfg.BotFile))
 	if err != nil {
 		return err
 	}
@@ -116,8 +116,8 @@ func runServer() error {
 
 	var g = &server.GRPC{
 		AppName: runtimeutil.AppName,
+		TB:      tb,
 		Client:  client,
-		SMTP:    smtp,
 	}
 	if err := g.Startup(); err != nil {
 		return err
