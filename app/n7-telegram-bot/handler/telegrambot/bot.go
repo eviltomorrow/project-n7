@@ -3,6 +3,7 @@ package telegrambot
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -37,17 +38,25 @@ func (b *Bot) Run() error {
 	server := http.Server{
 		Addr: fmt.Sprintf("0.0.0.0:%d", b.Port),
 	}
+
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			zlog.Fatal("ListenAndServe on http failure", zap.Error(err))
 		}
 	}()
 	go func() {
+		var ac = &accumulator{
+			SyncInterval: 2 * time.Hour,
+			Stop:         make(chan struct{}),
+			Subscribe:    map[string]*chat{},
+			Unsubscribe:  make(chan *chat, 32),
+		}
+		ac.load()
 
 		for u := range update {
-			if u.Message == nil {
+			go func(u tgbotapi.Update) {
 
-			}
+			}(u)
 		}
 	}()
 	return nil
