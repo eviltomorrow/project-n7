@@ -11,6 +11,7 @@ import (
 type TelegramBot struct {
 	DomainName  string `json:"domain-name"`
 	Pattern     string `json:"pattern"`
+	Port        int    `json:"listen-port"`
 	AccessToken string `json:"access-token"`
 }
 

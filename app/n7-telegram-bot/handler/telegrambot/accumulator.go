@@ -10,43 +10,59 @@ import (
 	"go.uber.org/zap"
 )
 
-type chat struct {
-	id       int64
-	status   int
-	username string
+const (
+	Subscribe   = "subscribe"
+	Unsubscribe = "unsubscribe"
+)
+
+var lib = &accumulator{
+	syncInterval: 2 * time.Hour,
+	stop:         make(chan struct{}),
+
+	subscribe:   map[string]*Session{},
+	unsubscribe: make(chan *Session, 32),
 }
 
+func GetLib() *accumulator {
+	return lib
+}
+
+type Session struct {
+	Status   string
+	ChatId   int64
+	Username string
+}
 type accumulator struct {
 	sync.RWMutex
 
-	SyncInterval time.Duration
-	Stop         chan struct{}
+	syncInterval time.Duration
+	stop         chan struct{}
 
-	Subscribe   map[string]*chat
-	Unsubscribe chan *chat
+	subscribe   map[string]*Session
+	unsubscribe chan *Session
 }
 
-func (a *accumulator) get(username string) (*chat, bool) {
+func (a *accumulator) Get(username string) (*Session, bool) {
 	a.RLock()
 	defer a.RUnlock()
 
-	s, ok := a.Subscribe[username]
+	s, ok := a.subscribe[username]
 	return s, ok
 }
 
-func (a *accumulator) set(s *chat) {
+func (a *accumulator) Set(s *Session) {
 	a.Lock()
 	defer a.Unlock()
 
-	if _, ok := a.Subscribe[s.username]; ok {
-		if s.status == 1 {
-			a.Unsubscribe <- s
+	if _, ok := a.subscribe[s.Username]; ok {
+		if s.Status == Unsubscribe {
+			a.unsubscribe <- s
 		}
 	}
-	a.Subscribe[s.username] = s
+	a.subscribe[s.Username] = s
 }
 
-func (a *accumulator) load() {
+func (a *accumulator) load() error {
 	a.Lock()
 	defer a.Unlock()
 
@@ -54,45 +70,56 @@ func (a *accumulator) load() {
 		offset, limit int64 = 0, 50
 	)
 	for {
-		subscribes, err := db.SubscribeWithSelectRange(mysql.DB, offset, limit, 30*time.Second)
+		sessions, err := db.SessionWithSelectRange(mysql.DB, offset, limit, 30*time.Second)
 		if err != nil {
-			zlog.Error("SubscribeWithSelectRange failure", zap.Error(err))
-			break
+			return err
 		}
-		for _, s := range subscribes {
-			a.Subscribe[s.Username] = &chat{username: s.Username, id: s.ChatId, status: s.Status}
+		for _, s := range sessions {
+			a.subscribe[s.Username] = &Session{Username: s.Username, ChatId: s.ChatId, Status: s.Status}
 		}
-		if int64(len(subscribes)) < limit {
+		if int64(len(sessions)) < limit {
 			break
 		}
 		offset += limit
 	}
 	go a.sync()
+
+	return nil
 }
 
 func (a *accumulator) sync() {
-	var ticker = time.NewTicker(a.SyncInterval)
+	var ticker = time.NewTicker(a.syncInterval)
 	for {
 		select {
 		case <-ticker.C:
-			var subscribes = make([]*chat, 0, 32)
+			if err := a.Flush(); err != nil {
+				zlog.Error("Flush session data failure", zap.Error(err))
+			}
+		case s := <-a.unsubscribe:
+			if _, err := db.SessionWithUpdateOne(mysql.DB, s.Username, &db.Session{Username: s.Username, ChatId: s.ChatId, Status: Unsubscribe}, 10*time.Second); err != nil {
+				zlog.Error("SessionWithUpdateOne failure", zap.Error(err))
+			}
 			a.Lock()
-			for _, v := range a.Subscribe {
-				subscribes = append(subscribes, v)
-			}
+			delete(a.subscribe, s.Username)
 			a.Unlock()
-
-			for _, s := range subscribes {
-				if _, err := db.SubscribeWithInsertOrUpdateOne(mysql.DB, s.username, &db.Subscribe{Username: s.username, ChatId: s.id, Status: s.status}, 10*time.Second); err != nil {
-					zlog.Error("SubscribeWithInsertOrUpdateOne failure", zap.Error(err))
-				}
-			}
-		case s := <-a.Unsubscribe:
-			if _, err := db.SubscribeWithUpdateOne(mysql.DB, s.username, &db.Subscribe{Username: s.username, ChatId: s.id, Status: 1}, 10*time.Second); err != nil {
-				zlog.Error("SubscribeWithUpdateOne failure", zap.Error(err))
-			}
-		case <-a.Stop:
+		case <-a.stop:
 			return
 		}
 	}
+}
+
+func (a *accumulator) Flush() error {
+	var sessions = make([]*Session, 0, 32)
+	a.Lock()
+	for _, v := range a.subscribe {
+		sessions = append(sessions, v)
+	}
+	a.Unlock()
+
+	for _, s := range sessions {
+		if _, err := db.SessionWithInsertOrUpdateOne(mysql.DB, s.Username, &db.Session{Username: s.Username, ChatId: s.ChatId, Status: s.Status}, 10*time.Second); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -1,4 +1,4 @@
-package mysql
+package sqlite3
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
@@ -35,14 +35,14 @@ func Build() error {
 			if err != nil {
 				return err
 			}
-			return fmt.Errorf("panic: connect mysql failure, err is nil?")
+			return fmt.Errorf("panic: connect SQLite3 failure, err is nil?")
 		}
 		pool, err = buildMySQL(DSN)
 		if err == nil {
 			break
 		}
 		if err != nil {
-			log.Printf("[W] Try to connect to MySQL=>[Retry: %d], nest error: %v\r\n", i, err)
+			log.Printf("[W] Try to connect to SQLite3=>[Retry: %d], nest error: %v\r\n", i, err)
 		}
 		i++
 		time.Sleep(Period)
@@ -65,7 +65,7 @@ func buildMySQL(dsn string) (*sql.DB, error) {
 	if dsn == "" {
 		return nil, fmt.Errorf("DSN no set")
 	}
-	pool, err := sql.Open("mysql", DSN)
+	pool, err := sql.Open("sqlite3", DSN)
 	if err != nil {
 		return nil, err
 	}

@@ -47,7 +47,7 @@ compile:
 
 # build
 .PHONY: build
-build: export CGO_ENABLED=0
+build: export CGO_ENABLED=1
 build: 
 ifeq (${app},)
 	@bash build/app_build.sh ${LDFLAGS} ${GCFLAGS}
@@ -56,7 +56,7 @@ else
 	@mkdir -p bin/${app}/etc
 	@cp -rp app/${app}/etc bin/${app}/
 	@echo "$(CGREEN)=> Building binary(${app})...$(CEND)"
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/${app}/bin/${app} app/${app}/main.go
+	go build -race ${LDFLAGS} ${GCFLAGS} -o bin/${app}/bin/${app} app/${app}/main.go
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 endif
 

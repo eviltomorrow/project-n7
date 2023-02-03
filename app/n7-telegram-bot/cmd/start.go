@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"time"
 
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/conf"
+	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/handler/db"
+	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/handler/telegrambot"
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/server"
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/fs"
@@ -15,6 +18,7 @@ import (
 	"github.com/eviltomorrow/project-n7/lib/procutil"
 	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
 	"github.com/eviltomorrow/project-n7/lib/self"
+	"github.com/eviltomorrow/project-n7/lib/sqlite3"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
@@ -24,7 +28,10 @@ import (
 var workflowsFunc = []func() error{
 	setRuntime,
 	loadConfig,
+	printCfg,
 	setGlobal,
+	runDB,
+	runBot,
 	runServer,
 	buildPidFile,
 	rewritePaniclog,
@@ -55,6 +62,7 @@ var StartCommand = &cli.Command{
 				return err
 			}
 		}
+
 		procutil.WaitForSigterm()
 		return nil
 	},
@@ -73,12 +81,12 @@ func loadConfig() error {
 	}
 	self.RegisterClearFuncs(closeFuncs...)
 
-	zlog.Info("Load config file complete", zap.String("conf", cfg.String()))
 	return nil
 }
 
 func setGlobal() error {
 	etcd.Endpoints = cfg.Etcd.Endpoints
+	sqlite3.DSN = cfg.SQLite3.DSN
 	middleware.LogDir = filepath.Join(runtimeutil.ExecutableDir, "../log")
 
 	server.ListenHost = cfg.Server.Host
@@ -90,11 +98,43 @@ func setRuntime() error {
 	for _, dir := range []string{
 		filepath.Join(runtimeutil.ExecutableDir, "../log"),
 		filepath.Join(runtimeutil.ExecutableDir, "../var/run"),
+		filepath.Join(runtimeutil.ExecutableDir, "../db"),
 	} {
 		if err := fs.CreateDir(dir); err != nil {
 			return fmt.Errorf("create dir failure, nest error: %v", err)
 		}
 	}
+	return nil
+}
+
+func runBot() error {
+	botC, err := conf.FindTelegramBot(filepath.Join(runtimeutil.ExecutableDir, cfg.BotFile))
+	if err != nil {
+		return err
+	}
+	var bot = &telegrambot.Bot{
+		DomainName:  botC.DomainName,
+		Pattern:     botC.Pattern,
+		Port:        botC.Port,
+		AccessToken: botC.AccessToken,
+	}
+	if bot.Run(); err != nil {
+		return err
+	}
+	self.RegisterClearFuncs(bot.Stop)
+	return nil
+}
+
+func runDB() error {
+	if err := sqlite3.Build(); err != nil {
+		return err
+	}
+
+	if err := db.SessionWithInitTable(sqlite3.DB, 10*time.Second); err != nil {
+		return err
+	}
+	self.RegisterClearFuncs(sqlite3.Close)
+
 	return nil
 }
 
@@ -142,5 +182,10 @@ func buildPidFile() error {
 		return err
 	}
 	self.RegisterClearFuncs(closeFunc)
+	return nil
+}
+
+func printCfg() error {
+	zlog.Info("Load config success", zap.String("config", cfg.String()))
 	return nil
 }
