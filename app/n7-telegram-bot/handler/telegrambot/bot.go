@@ -38,10 +38,6 @@ func (b *Bot) Run() error {
 		Addr: fmt.Sprintf("0.0.0.0:%d", b.Port),
 	}
 
-	if err := lib.load(); err != nil {
-		return err
-	}
-
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			zlog.Fatal("ListenAndServe on http failure", zap.Error(err))

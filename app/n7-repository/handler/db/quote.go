@@ -135,7 +135,7 @@ func QuoteWithSelectBetweenByCodeAndDate(exec mysql.Exec, mode string, code stri
 		}
 
 		if d.Xd != 1.0 {
-			xd = d.Xd
+			xd = xd * d.Xd
 		}
 	}
 

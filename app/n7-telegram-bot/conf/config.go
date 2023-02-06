@@ -10,11 +10,9 @@ import (
 )
 
 type Config struct {
-	ServiceName string  `json:"service-name" toml:"service-name"`
-	Server      Server  `json:"server" toml:"server"`
-	Etcd        Etcd    `json:"etcd" toml:"etcd"`
-	SQLite3     SQLite3 `json:"sqlite3" toml:"sqlite3"`
-	BotFile     string  `json:"bot-file" toml:"bot-file"`
+	ServiceName string `json:"service-name" toml:"service-name"`
+	Server      Server `json:"server" toml:"server"`
+	BotFile     string `json:"bot-file" toml:"bot-file"`
 
 	Log Log `json:"log" toml:"log"`
 }
@@ -38,7 +36,7 @@ type Etcd struct {
 	Endpoints []string `json:"endpoints" toml:"endpoints"`
 }
 
-type SQLite3 struct {
+type MySQL struct {
 	DSN     string `json:"dsn" toml:"dsn"`
 	MinOpen int    `json:"min-open" toml:"min-open"`
 	MaxOpen int    `json:"max-open" toml:"max-open"`
@@ -60,16 +58,6 @@ var DefaultGlobal = &Config{
 	Server: Server{
 		Host: "0.0.0.0",
 		Port: 5274,
-	},
-	Etcd: Etcd{
-		Endpoints: []string{
-			"127.0.0.1:2379",
-		},
-	},
-	SQLite3: SQLite3{
-		DSN:     "../db/telegram-bot.db",
-		MinOpen: 3,
-		MaxOpen: 10,
 	},
 	Log: Log{
 		DisableTimestamp: false,

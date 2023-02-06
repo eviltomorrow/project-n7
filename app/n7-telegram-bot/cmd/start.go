@@ -4,25 +4,19 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
-	"time"
 
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/conf"
-	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/handler/db"
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/handler/telegrambot"
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/server"
-	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/fs"
-	"github.com/eviltomorrow/project-n7/lib/grpc/lb"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
 	"github.com/eviltomorrow/project-n7/lib/pid"
 	"github.com/eviltomorrow/project-n7/lib/procutil"
 	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
 	"github.com/eviltomorrow/project-n7/lib/self"
-	"github.com/eviltomorrow/project-n7/lib/sqlite3"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/resolver"
 )
 
 var workflowsFunc = []func() error{
@@ -30,7 +24,6 @@ var workflowsFunc = []func() error{
 	loadConfig,
 	printCfg,
 	setGlobal,
-	runDB,
 	runBot,
 	runServer,
 	buildPidFile,
@@ -85,8 +78,6 @@ func loadConfig() error {
 }
 
 func setGlobal() error {
-	etcd.Endpoints = cfg.Etcd.Endpoints
-	sqlite3.DSN = cfg.SQLite3.DSN
 	middleware.LogDir = filepath.Join(runtimeutil.ExecutableDir, "../log")
 
 	server.ListenHost = cfg.Server.Host
@@ -98,7 +89,6 @@ func setRuntime() error {
 	for _, dir := range []string{
 		filepath.Join(runtimeutil.ExecutableDir, "../log"),
 		filepath.Join(runtimeutil.ExecutableDir, "../var/run"),
-		filepath.Join(runtimeutil.ExecutableDir, "../db"),
 	} {
 		if err := fs.CreateDir(dir); err != nil {
 			return fmt.Errorf("create dir failure, nest error: %v", err)
@@ -125,39 +115,19 @@ func runBot() error {
 	return nil
 }
 
-func runDB() error {
-	if err := sqlite3.Build(); err != nil {
-		return err
-	}
-
-	if err := db.SessionWithInitTable(sqlite3.DB, 10*time.Second); err != nil {
-		return err
-	}
-	self.RegisterClearFuncs(sqlite3.Close)
-
-	return nil
-}
-
 func runServer() error {
 	tb, err := conf.FindTelegramBot(filepath.Join(runtimeutil.ExecutableDir, cfg.BotFile))
 	if err != nil {
 		return err
 	}
-	client, err := etcd.NewClient()
-	if err != nil {
-		return err
-	}
-	self.RegisterClearFuncs(client.Close)
 
 	if err := middleware.InitLogger(); err != nil {
 		return err
 	}
-	resolver.Register(lb.NewBuilder(client))
 
 	var g = &server.GRPC{
 		AppName: runtimeutil.AppName,
 		TB:      tb,
-		Client:  client,
 	}
 	if err := g.Startup(); err != nil {
 		return err

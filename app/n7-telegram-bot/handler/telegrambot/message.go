@@ -16,10 +16,15 @@ func reply(bot *tgbotapi.BotAPI, u tgbotapi.Update) error {
 		text     = u.Message.Text
 		// textID   = u.Message.MessageID
 	)
+	zlog.Info("User text", zap.String("text", text), zap.String("username", username))
+
+	if username != "eviltomorrow" {
+		return fmt.Errorf("not public service")
+	}
 	text = strings.TrimSpace(text)
 
 	switch text {
-	case "/start":
+	case "/start", "订阅":
 		msg := tgbotapi.NewMessage(chatID, `这是一个私人使用得股票提醒机器人，不构成任何投资建议，取消提醒请输入"取消订阅"`)
 		if _, err := bot.Send(msg); err != nil {
 			return err
@@ -34,7 +39,7 @@ func reply(bot *tgbotapi.BotAPI, u tgbotapi.Update) error {
 		lib.Set(&Session{Username: username, ChatId: chatID, Status: Unsubscribe})
 
 	default:
-		zlog.Info("User text", zap.String("text", text), zap.String("username", username))
+
 	}
 
 	return nil

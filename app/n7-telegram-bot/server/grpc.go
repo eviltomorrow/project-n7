@@ -7,10 +7,9 @@ import (
 	"net"
 
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/conf"
-	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
+	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-telegram-bot"
 	"github.com/eviltomorrow/project-n7/lib/netutil"
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -23,12 +22,12 @@ var (
 type GRPC struct {
 	AppName string
 	TB      *conf.TelegramBot
-	Client  *clientv3.Client
 
-	ctx        context.Context
-	cancel     func()
-	revokeFunc func() error
-	server     *grpc.Server
+	ctx    context.Context
+	cancel func()
+	server *grpc.Server
+
+	pb.UnimplementedTelegramBotServer
 }
 
 func setDefault() error {
@@ -76,13 +75,9 @@ func (g *GRPC) Startup() error {
 		),
 	)
 	g.ctx, g.cancel = context.WithCancel(context.Background())
-	g.revokeFunc, err = etcd.RegisterService(g.ctx, g.AppName, AccessHost, Port, 10, g.Client)
-	if err != nil {
-		return err
-	}
 
 	reflection.Register(g.server)
-	// pb.RegisterEmailServer(g.server, g)
+	pb.RegisterTelegramBotServer(g.server, g)
 	go func() {
 		if err := g.server.Serve(listen); err != nil {
 			log.Fatalf("Startup grpc server failure, nest error: %v", err)
@@ -92,10 +87,6 @@ func (g *GRPC) Startup() error {
 }
 
 func (g *GRPC) Shutdown() error {
-	if g.revokeFunc != nil {
-		g.revokeFunc()
-	}
-
 	if g.server != nil {
 		g.server.Stop()
 	}

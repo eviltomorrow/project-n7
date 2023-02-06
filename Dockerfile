@@ -9,7 +9,7 @@ ARG BUILDTIME=unknown
 ENV MAINVERSION=${MAINVERSION} \
     GITSHA=${GITSHA} \
     BUILDTIME=${BUILDTIME} 
-RUN CGO_ENABLED=1 GOOS=linux go build -race -ldflags "-X main.MainVersion=${MAINVERSION} -X main.GitSha=${GITSHA} -X main.BuildTime=${BUILDTIME} -s -w" -gcflags "all=-trimpath=$(go env GOPATH)" -o bin/${APPNAME}/bin/${APPNAME} app/${APPNAME}/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.MainVersion=${MAINVERSION} -X main.GitSha=${GITSHA} -X main.BuildTime=${BUILDTIME} -s -w" -gcflags "all=-trimpath=$(go env GOPATH)" -o bin/${APPNAME}/bin/${APPNAME} app/${APPNAME}/main.go
 
 FROM alpine:latest as prod
 
