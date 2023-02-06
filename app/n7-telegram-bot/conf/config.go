@@ -13,6 +13,7 @@ type Config struct {
 	ServiceName string `json:"service-name" toml:"service-name"`
 	Server      Server `json:"server" toml:"server"`
 	BotFile     string `json:"bot-file" toml:"bot-file"`
+	DB          DB     `json:"db" toml:"db"`
 
 	Log Log `json:"log" toml:"log"`
 }
@@ -27,19 +28,13 @@ func (c *Config) ParseFile(path string) error {
 	return err
 }
 
+type DB struct {
+	Path string `json:"path"`
+}
+
 type Server struct {
 	Host string `json:"host" toml:"host"`
 	Port int    `json:"port" toml:"port"`
-}
-
-type Etcd struct {
-	Endpoints []string `json:"endpoints" toml:"endpoints"`
-}
-
-type MySQL struct {
-	DSN     string `json:"dsn" toml:"dsn"`
-	MinOpen int    `json:"min-open" toml:"min-open"`
-	MaxOpen int    `json:"max-open" toml:"max-open"`
 }
 
 type Log struct {
@@ -58,6 +53,9 @@ var DefaultGlobal = &Config{
 	Server: Server{
 		Host: "0.0.0.0",
 		Port: 5274,
+	},
+	DB: DB{
+		Path: "../db/telegrambot.db",
 	},
 	Log: Log{
 		DisableTimestamp: false,
