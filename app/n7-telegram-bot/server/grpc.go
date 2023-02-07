@@ -7,16 +7,20 @@ import (
 	"net"
 
 	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/conf"
+	"github.com/eviltomorrow/project-n7/app/n7-telegram-bot/handler/telegrambot"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
 	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-telegram-bot"
 	"github.com/eviltomorrow/project-n7/lib/netutil"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var (
 	ListenHost, AccessHost string
 	Port                   int
+	Bot                    *telegrambot.Bot
 )
 
 type GRPC struct {
@@ -52,6 +56,18 @@ func setDefault() error {
 		return fmt.Errorf("panic: invalid ListenHost/AccessHost or Port")
 	}
 	return nil
+}
+
+func (g *GRPC) Send(ctx context.Context, chat *pb.Chat) (*wrapperspb.StringValue, error) {
+	if chat == nil {
+		return nil, fmt.Errorf("illegal parameter, nest error: chat is nil")
+	}
+	if err := telegrambot.Send(Bot, chat.Username, chat.Text); err != nil {
+		return nil, err
+	}
+
+	var uid = uuid.New()
+	return &wrapperspb.StringValue{Value: uid.String()}, nil
 }
 
 func (g *GRPC) Startup() error {

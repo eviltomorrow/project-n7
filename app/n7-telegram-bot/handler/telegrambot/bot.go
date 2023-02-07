@@ -3,6 +3,7 @@ package telegrambot
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -19,7 +20,7 @@ type Bot struct {
 }
 
 func (b *Bot) Run() error {
-	bot, err := tgbotapi.NewBotAPI(b.AccessToken)
+	bot, err := tgbotapi.NewBotAPIWithClient(b.AccessToken, tgbotapi.APIEndpoint, &http.Client{Timeout: 5 * time.Second})
 	if err != nil {
 		return err
 	}
@@ -29,6 +30,7 @@ func (b *Bot) Run() error {
 	if err != nil {
 		return err
 	}
+
 	if _, err := bot.Request(hook); err != nil {
 		return err
 	}
@@ -36,6 +38,10 @@ func (b *Bot) Run() error {
 	update := bot.ListenForWebhook(fmt.Sprintf("%s%s", b.Pattern, b.AccessToken))
 	server := http.Server{
 		Addr: fmt.Sprintf("0.0.0.0:%d", b.Port),
+	}
+
+	if err := lib.load(); err != nil {
+		return err
 	}
 
 	go func() {

@@ -89,6 +89,7 @@ func setRuntime() error {
 	for _, dir := range []string{
 		filepath.Join(runtimeutil.ExecutableDir, "../log"),
 		filepath.Join(runtimeutil.ExecutableDir, "../var/run"),
+		filepath.Join(runtimeutil.ExecutableDir, "../db"),
 	} {
 		if err := fs.CreateDir(dir); err != nil {
 			return fmt.Errorf("create dir failure, nest error: %v", err)
@@ -108,9 +109,11 @@ func runBot() error {
 		Port:        botC.Port,
 		AccessToken: botC.AccessToken,
 	}
-	if bot.Run(); err != nil {
+	if err := bot.Run(); err != nil {
 		return err
 	}
+
+	server.Bot = bot
 	self.RegisterClearFuncs(bot.Stop)
 	return nil
 }
