@@ -35,14 +35,14 @@ func reply(bot *tgbotapi.BotAPI, u tgbotapi.Update) error {
 		}
 		lib.Set(&db.Session{Username: username, ChatID: chatID, Status: Subscribe})
 
-	case "/订阅":
+	case "订阅":
 		msg := tgbotapi.NewMessage(chatID, `订阅成功`)
 		if _, err := bot.Send(msg); err != nil {
 			return err
 		}
 		lib.Set(&db.Session{Username: username, ChatID: chatID, Status: Subscribe})
 
-	case "/取消":
+	case "取消":
 		msg := tgbotapi.NewMessage(chatID, `取消成功`)
 		if _, err := bot.Send(msg); err != nil {
 			return err
