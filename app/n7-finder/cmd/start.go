@@ -24,6 +24,7 @@ import (
 var workflowsFunc = []func() error{
 	setRuntime,
 	loadConfig,
+	printCfg,
 	setGlobal,
 	runServer,
 	buildPidFile,
@@ -73,7 +74,6 @@ func loadConfig() error {
 	}
 	self.RegisterClearFuncs(closeFuncs...)
 
-	zlog.Info("Load config file complete", zap.String("conf", cfg.String()))
 	return nil
 }
 
@@ -137,5 +137,10 @@ func buildPidFile() error {
 		return err
 	}
 	self.RegisterClearFuncs(closeFunc)
+	return nil
+}
+
+func printCfg() error {
+	zlog.Info("Load config success", zap.String("config", cfg.String()))
 	return nil
 }

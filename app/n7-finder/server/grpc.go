@@ -8,10 +8,12 @@ import (
 
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
+	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-finder"
 	"github.com/eviltomorrow/project-n7/lib/netutil"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var (
@@ -28,7 +30,7 @@ type GRPC struct {
 	revokeFunc func() error
 	server     *grpc.Server
 
-	// pb.UnimplementedEmailServer
+	pb.UnimplementedFinderServer
 }
 
 func setDefault() error {
@@ -53,6 +55,10 @@ func setDefault() error {
 		return fmt.Errorf("panic: invalid ListenHost/AccessHost or Port")
 	}
 	return nil
+}
+
+func (g *GRPC) LookupTransaction(ctx context.Context, req *wrapperspb.StringValue) (*pb.Stock, error) {
+	return nil, nil
 }
 
 func (g *GRPC) Startup() error {
@@ -82,7 +88,7 @@ func (g *GRPC) Startup() error {
 	}
 
 	reflection.Register(g.server)
-	// pb.RegisterDiscoverServer(g.server, g)
+	pb.RegisterFinderServer(g.server, g)
 	go func() {
 		if err := g.server.Serve(listen); err != nil {
 			log.Fatalf("Startup grpc server failure, nest error: %v", err)
