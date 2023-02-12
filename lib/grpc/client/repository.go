@@ -12,10 +12,14 @@ import (
 )
 
 func NewRepository() (pb.RepositoryClient, func() error, error) {
+	var target = "etcd:///grpclb/n7-repository"
+	return NewRepositoryWithTarget(target)
+}
+
+func NewRepositoryWithTarget(target string) (pb.RepositoryClient, func() error, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var target = "etcd:///grpclb/n7-repository"
 	conn, err := grpc.DialContext(
 		ctx,
 		target,

@@ -7,6 +7,7 @@ import (
 
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/grpc/lb"
+	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-repository"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -41,5 +42,28 @@ func TestGetStock(t *testing.T) {
 		}
 		i++
 		t.Logf("[%4d]%s\r\n", i, stock.String())
+	}
+}
+
+func TestGetQuote(t *testing.T) {
+	client, closed, err := NewRepositoryWithTarget("101.42.255.204:5272")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer closed()
+
+	resp, err := client.GetQuoteLatest(context.Background(), &pb.QuoteRequest{Code: "sh601066", Date: "2023-22-10", Limit: 200})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		quote, err := resp.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("Quote: %v", quote)
 	}
 }
