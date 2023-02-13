@@ -17,7 +17,7 @@ func TestKDropMA10UPMatch(t *testing.T) {
 	}
 	defer closed()
 
-	resp, err := client.GetQuoteLatest(context.Background(), &pb.QuoteRequest{Code: "sh601066", Date: "2023-22-10", Limit: 200})
+	resp, err := client.GetQuoteLatest(context.Background(), &pb.QuoteRequest{Code: "sh601066", Date: "2023-22-10", Limit: 20})
 	if err != nil {
 		t.Fatal(err)
 	}

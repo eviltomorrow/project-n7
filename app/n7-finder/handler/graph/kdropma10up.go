@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"fmt"
-
 	"github.com/eviltomorrow/project-n7/app/n7-finder/handler/calculate"
 	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-repository"
 	"github.com/eviltomorrow/project-n7/lib/mathutil"
@@ -26,7 +24,10 @@ func (k *KDropMA10UP) Match(data []*pb.Quote) bool {
 			closed = closed[1:]
 		}
 	}
-	fmt.Println(ma10)
+
+	for i := len(ma10) - 1; i >= 0; i-- {
+
+	}
 
 	return true
 }
