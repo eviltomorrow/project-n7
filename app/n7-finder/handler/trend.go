@@ -1,5 +1,7 @@
 package handler
 
+import pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-repository"
+
 type Direction int
 
 const (
@@ -9,5 +11,5 @@ const (
 )
 
 type Trend interface {
-	Observe() Direction
+	Match(data []*pb.Quote) Direction
 }
