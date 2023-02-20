@@ -1,4 +1,4 @@
-package graph
+package buy
 
 import (
 	"github.com/eviltomorrow/project-n7/app/n7-finder/handler/calculate"
@@ -6,12 +6,12 @@ import (
 	"github.com/eviltomorrow/project-n7/lib/mathutil"
 )
 
-type KDropMA10UP struct {
+type MA10 struct {
 }
 
-func (k *KDropMA10UP) Match(data []*pb.Quote) bool {
+func (m *MA10) Locate(data []*pb.Quote) (string, int, bool) {
 	if len(data) <= 14 {
-		return false
+		return "", 0, false
 	}
 	var (
 		closed = make([]float64, 0, 10)
@@ -25,9 +25,6 @@ func (k *KDropMA10UP) Match(data []*pb.Quote) bool {
 		}
 	}
 
-	for i := len(ma10) - 1; i >= 0; i-- {
-
-	}
-
-	return true
+	_ = ma10
+	return "", 0, false
 }

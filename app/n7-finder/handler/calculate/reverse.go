@@ -1,4 +1,4 @@
-package handler
+package calculate
 
 import pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-repository"
 
