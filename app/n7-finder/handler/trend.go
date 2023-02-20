@@ -10,6 +10,6 @@ const (
 	HORIZONTAL
 )
 
-type Trend interface {
-	Match(data []*pb.Quote) Direction
+func Findtrend(data []*pb.Quote) Direction {
+	return HORIZONTAL
 }
