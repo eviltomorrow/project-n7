@@ -14,8 +14,6 @@ import (
 var (
 	MainVersion = "unknown"
 	GitSha      = "unknown"
-	GitTag      = "unknown"
-	GitBranch   = "unknown"
 	BuildTime   = "unknown"
 )
 
