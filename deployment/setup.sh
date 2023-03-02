@@ -72,13 +72,13 @@ chmod a+x $(pwd)/data/mongo/init/init_mongo.js
 # my.cnf 
 cat > $(pwd)/data/mysql/conf/my.cnf <<EOF
 [client]
-port = 3306
+port = 3307
 default-character-set = utf8
 
 [mysqld]
 user = mysql
 server-id = 1
-port = 3306
+port = 3307
 character-set-server = utf8mb4
 authentication_policy = mysql_native_password
 secure_file_priv = /var/lib/mysql
