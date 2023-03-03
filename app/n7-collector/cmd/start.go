@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/eviltomorrow/project-n7/app/n7-collector/conf"
 	"github.com/eviltomorrow/project-n7/app/n7-collector/handler/crontab"
@@ -46,6 +47,7 @@ var StartCommand = &cli.Command{
 		&cli.BoolFlag{Name: "daemon", Value: false, Usage: "run app in background", Aliases: []string{"d"}},
 	},
 	Action: func(ctx *cli.Context) error {
+		var begin = time.Now()
 		if isDaemon := ctx.Bool("daemon"); isDaemon {
 			if err := procutil.RunInBackground(runtimeutil.AppName, []string{"start"}, nil, nil); err != nil {
 				log.Fatalf("[F] Run app in background failure, nest error: %v", err)
@@ -64,6 +66,7 @@ var StartCommand = &cli.Command{
 				return err
 			}
 		}
+		zlog.Info("Start app success", zap.String("app-name", runtimeutil.AppName), zap.Duration("cost", time.Since(begin)))
 		procutil.WaitForSigterm()
 		return nil
 	},
