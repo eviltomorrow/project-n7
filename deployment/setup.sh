@@ -85,7 +85,7 @@ secure_file_priv = /var/lib/mysql
 expire_logs_days = 7
 max_connections = 1000
 log_error = /var/log/mysql/error.log
-socket = /run/mysqld/mysqld.socket
+socket = /run/mysqld/mysqld.sock
 sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,PIPES_AS_CONCAT,ANSI_QUOTES'
 EOF
 
