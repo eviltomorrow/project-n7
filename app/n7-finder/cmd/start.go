@@ -5,7 +5,6 @@ import (
 	"log"
 	"path/filepath"
 	"time"
-	"ultra-oa-agent/pkg/self"
 
 	"github.com/eviltomorrow/project-n7/app/n7-finder/conf"
 	"github.com/eviltomorrow/project-n7/app/n7-finder/server"
@@ -108,7 +107,7 @@ func runServer() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(client.Close)
+	cleanup.RegisterCleanupFuncs(client.Close)
 
 	if err := middleware.InitLogger(); err != nil {
 		return err
@@ -122,7 +121,7 @@ func runServer() error {
 	if err := g.Startup(); err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(g.Shutdown)
+	cleanup.RegisterCleanupFuncs(g.Shutdown)
 
 	zlog.Info("Startup GRPC Server complete", zap.String("addrs", fmt.Sprintf("%s:%d", server.ListenHost, server.Port)))
 	return nil
@@ -141,7 +140,7 @@ func buildPidFile() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(closeFunc)
+	cleanup.RegisterCleanupFuncs(closeFunc)
 	return nil
 }
 

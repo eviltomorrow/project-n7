@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"ultra-oa-agent/pkg/self"
 
 	"github.com/eviltomorrow/project-n7/app/n7-collector/conf"
 	"github.com/eviltomorrow/project-n7/app/n7-collector/handler/crontab"
@@ -125,7 +124,7 @@ func runDB() error {
 	if err := mongodb.Build(); err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(mongodb.Close)
+	cleanup.RegisterCleanupFuncs(mongodb.Close)
 
 	return nil
 }
@@ -135,7 +134,7 @@ func runServer() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(client.Close)
+	cleanup.RegisterCleanupFuncs(client.Close)
 
 	if err := middleware.InitLogger(); err != nil {
 		return err
@@ -149,7 +148,7 @@ func runServer() error {
 	if err := g.Startup(); err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(g.Shutdown)
+	cleanup.RegisterCleanupFuncs(g.Shutdown)
 	zlog.Info("Startup GRPC server success", zap.String("host", server.ListenHost), zap.Int("port", server.Port))
 	return nil
 }
@@ -166,7 +165,7 @@ func runCron() error {
 	}
 	c.Start()
 
-	self.RegisterClearFuncs(func() error {
+	cleanup.RegisterCleanupFuncs(func() error {
 		c.Stop()
 		return nil
 	})
@@ -186,7 +185,7 @@ func buildPidFile() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(closeFunc)
+	cleanup.RegisterCleanupFuncs(closeFunc)
 	return nil
 }
 
