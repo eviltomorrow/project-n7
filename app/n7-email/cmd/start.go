@@ -8,14 +8,14 @@ import (
 
 	"github.com/eviltomorrow/project-n7/app/n7-email/conf"
 	"github.com/eviltomorrow/project-n7/app/n7-email/server"
+	"github.com/eviltomorrow/project-n7/lib/cleanup"
 	"github.com/eviltomorrow/project-n7/lib/etcd"
 	"github.com/eviltomorrow/project-n7/lib/fs"
 	"github.com/eviltomorrow/project-n7/lib/grpc/lb"
 	"github.com/eviltomorrow/project-n7/lib/grpc/middleware"
+	"github.com/eviltomorrow/project-n7/lib/helper"
 	"github.com/eviltomorrow/project-n7/lib/pid"
 	"github.com/eviltomorrow/project-n7/lib/procutil"
-	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
-	"github.com/eviltomorrow/project-n7/lib/self"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
@@ -41,14 +41,14 @@ var StartCommand = &cli.Command{
 	Action: func(ctx *cli.Context) error {
 		var begin = time.Now()
 		if isDaemon := ctx.Bool("daemon"); isDaemon {
-			if err := procutil.RunInBackground(runtimeutil.AppName, []string{"start"}, nil, nil); err != nil {
+			if err := procutil.RunInBackground(helper.App.Name, []string{"start"}, nil, nil); err != nil {
 				log.Fatalf("[F] Run app in background failure, nest error: %v", err)
 			}
 			return nil
 		}
 
 		defer func() {
-			for _, err := range self.RunClearFuncs() {
+			for _, err := range cleanup.RunCleanupFuncs() {
 				zlog.Error("run clear funcs failure", zap.Error(err))
 			}
 		}()
@@ -58,7 +58,7 @@ var StartCommand = &cli.Command{
 				return err
 			}
 		}
-		zlog.Info("Start app success", zap.String("app-name", runtimeutil.AppName), zap.Duration("cost", time.Since(begin)))
+		zlog.Info("Start app success", zap.String("app-name", helper.App.Name), zap.Duration("cost", time.Since(begin)))
 		procutil.WaitForSigterm()
 		return nil
 	},
@@ -67,7 +67,7 @@ var StartCommand = &cli.Command{
 var cfg = conf.DefaultGlobal
 
 func loadConfig() error {
-	if err := cfg.ParseFile(filepath.Join(runtimeutil.ExecutableDir, "../etc/global.conf")); err != nil {
+	if err := cfg.ParseFile(filepath.Join(helper.Runtime.RootDir, "/etc/global.conf")); err != nil {
 		return err
 	}
 
@@ -75,7 +75,7 @@ func loadConfig() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(closeFuncs...)
+	cleanup.RegisterCleanupFuncs(closeFuncs...)
 
 	zlog.Info("Load config file complete", zap.String("conf", cfg.String()))
 	return nil
@@ -83,7 +83,7 @@ func loadConfig() error {
 
 func setGlobal() error {
 	etcd.Endpoints = cfg.Etcd.Endpoints
-	middleware.LogDir = filepath.Join(runtimeutil.ExecutableDir, "../log")
+	middleware.LogDir = filepath.Join(helper.Runtime.RootDir, "/log")
 
 	server.ListenHost = cfg.Server.Host
 	server.Port = cfg.Server.Port
@@ -92,8 +92,8 @@ func setGlobal() error {
 
 func setRuntime() error {
 	for _, dir := range []string{
-		filepath.Join(runtimeutil.ExecutableDir, "../log"),
-		filepath.Join(runtimeutil.ExecutableDir, "../var/run"),
+		filepath.Join(helper.Runtime.RootDir, "/log"),
+		filepath.Join(helper.Runtime.RootDir, "/var/run"),
 	} {
 		if err := fs.CreateDir(dir); err != nil {
 			return fmt.Errorf("create dir failure, nest error: %v", err)
@@ -103,7 +103,7 @@ func setRuntime() error {
 }
 
 func runServer() error {
-	smtp, err := conf.FindSMTP(filepath.Join(runtimeutil.ExecutableDir, cfg.SmtpFile))
+	smtp, err := conf.FindSMTP(filepath.Join(helper.Runtime.RootDir, cfg.SmtpFile))
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func runServer() error {
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(client.Close)
+	cleanup.RegisterCleanupFuncs(client.Close)
 
 	if err := middleware.InitLogger(); err != nil {
 		return err
@@ -119,21 +119,21 @@ func runServer() error {
 	resolver.Register(lb.NewBuilder(client))
 
 	var g = &server.GRPC{
-		AppName: runtimeutil.AppName,
+		AppName: helper.App.Name,
 		Client:  client,
 		SMTP:    smtp,
 	}
 	if err := g.Startup(); err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(g.Shutdown)
+	cleanup.RegisterCleanupFuncs(g.Shutdown)
 
 	zlog.Info("Startup GRPC Server complete", zap.String("addrs", fmt.Sprintf("%s:%d", server.ListenHost, server.Port)))
 	return nil
 }
 
 func rewritePaniclog() error {
-	fs.StderrFilePath = filepath.Join(runtimeutil.ExecutableDir, "../log/panic.log")
+	fs.StderrFilePath = filepath.Join(helper.Runtime.RootDir, "/log/panic.log")
 	if err := fs.RewriteStderrFile(); err != nil {
 		zlog.Error("RewriteStderrFile failure", zap.Error(err))
 	}
@@ -141,11 +141,11 @@ func rewritePaniclog() error {
 }
 
 func buildPidFile() error {
-	closeFunc, err := pid.CreatePidFile(filepath.Join(runtimeutil.ExecutableDir, fmt.Sprintf("../var/run/%s.pid", runtimeutil.AppName)))
+	closeFunc, err := pid.CreatePidFile(filepath.Join(helper.Runtime.RootDir, fmt.Sprintf("/var/run/%s.pid", helper.App.Name)))
 	if err != nil {
 		return err
 	}
-	self.RegisterClearFuncs(closeFunc)
+	cleanup.RegisterCleanupFuncs(closeFunc)
 	return nil
 }
 

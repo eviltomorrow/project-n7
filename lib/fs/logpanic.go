@@ -2,18 +2,21 @@ package fs
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
 	"syscall"
+
+	"github.com/eviltomorrow/project-n7/lib/helper"
 )
 
 var (
 	stdErrFileHandler *os.File
 
-	StderrFilePath = "../log/panic.log"
+	StderrFilePath = "/log/panic.log"
 )
 
 func RewriteStderrFile() error {
-	file, err := os.OpenFile(StderrFilePath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
+	file, err := os.OpenFile(filepath.Join(helper.Runtime.RootDir, StderrFilePath), os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}

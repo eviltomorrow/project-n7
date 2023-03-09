@@ -7,7 +7,7 @@ import (
 
 	"github.com/eviltomorrow/project-n7/app/n7-repository/cmd"
 	"github.com/eviltomorrow/project-n7/lib/buildinfo"
-	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
+	"github.com/eviltomorrow/project-n7/lib/helper"
 	"github.com/urfave/cli/v2"
 )
 
@@ -42,7 +42,7 @@ func runApp() error {
 	registerCommands(cmd.VersionCommand)
 
 	var app = &cli.App{
-		Name:     runtimeutil.AppName,
+		Name:     helper.App.Name,
 		Usage:    "stock/quote data repository",
 		Version:  buildinfo.MainVersion,
 		Compiled: time.Now(),

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/eviltomorrow/project-n7/lib/fs"
-	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
+	"github.com/eviltomorrow/project-n7/lib/helper"
 )
 
 func CreatePidFile(path string) (func() error, error) {
@@ -14,7 +14,7 @@ func CreatePidFile(path string) (func() error, error) {
 		return nil, err
 	}
 
-	file.WriteString(fmt.Sprintf("%d", runtimeutil.Pid))
+	file.WriteString(fmt.Sprintf("%d", helper.Runtime.Pid))
 	if err := file.Sync(); err != nil {
 		file.Close()
 		return nil, err

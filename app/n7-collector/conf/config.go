@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/eviltomorrow/project-n7/lib/runtimeutil"
+	"github.com/eviltomorrow/project-n7/lib/helper"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 )
 
@@ -96,7 +96,7 @@ var DefaultGlobal = &Config{
 		Format:           "text",
 		MaxSize:          30,
 		MaxDays:          180,
-		Dir:              "../log",
+		Dir:              "/log",
 		Compress:         true,
 	},
 }
@@ -107,7 +107,7 @@ func SetupLogger(l Log) ([]func() error, error) {
 		Format:           l.Format,
 		DisableTimestamp: l.DisableTimestamp,
 		File: zlog.FileLogConfig{
-			Filename:   filepath.Join(runtimeutil.ExecutableDir, filepath.Join(l.Dir, "data.log")),
+			Filename:   filepath.Join(helper.Runtime.RootDir, l.Dir, "data.log"),
 			MaxSize:    l.MaxSize,
 			MaxDays:    30,
 			MaxBackups: 30,

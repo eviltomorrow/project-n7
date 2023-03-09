@@ -14,7 +14,7 @@ func CreateDir(dir string) error {
 		return os.MkdirAll(dir, 0755)
 	}
 	if !fi.IsDir() {
-		return fmt.Errorf("not a folder, path: %v", dir)
+		return fmt.Errorf("already exist same file, path: %v", dir)
 	}
 	return nil
 }
