@@ -50,13 +50,13 @@ type Log struct {
 
 var DefaultGlobal = &Config{
 	ServiceName: "n7-telegram-bot",
-	BotFile:     "../etc/telegram-bot.json",
+	BotFile:     "/etc/telegram-bot.json",
 	Server: Server{
 		Host: "0.0.0.0",
 		Port: 5274,
 	},
 	DB: DB{
-		Path: "../db/telegrambot.db",
+		Path: "/db/telegrambot.db",
 	},
 	Log: Log{
 		DisableTimestamp: false,
