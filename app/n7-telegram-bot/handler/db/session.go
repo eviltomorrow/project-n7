@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var SessionPath = "../db/session.db"
+var SessionPath = "/db/session.db"
 
 type Session struct {
 	Username        string    `json:"username"`
