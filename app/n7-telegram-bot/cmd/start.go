@@ -50,6 +50,7 @@ var StartCommand = &cli.Command{
 			for _, err := range cleanup.RunCleanupFuncs() {
 				zlog.Error("run clear funcs failure", zap.Error(err))
 			}
+			zlog.Info("Stop app complete", zap.String("app-name", helper.App.Name), zap.String("running-duration", helper.Runtime.RunningDuration()))
 		}()
 
 		for _, f := range workflowsFunc {

@@ -7,8 +7,8 @@ import (
 )
 
 func WaitForSigterm() os.Signal {
-	var ch = make(chan os.Signal, 1)
-	signal.Notify(ch, os.Interrupt, syscall.SIGTSTP, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	for {
 		sig := <-ch
 		if sig == syscall.SIGHUP {
@@ -19,5 +19,6 @@ func WaitForSigterm() os.Signal {
 		// so the app could be interrupted by sending these signals again
 		// in the case if the caller doesn't finish the app gracefully.
 		signal.Stop(ch)
+		return sig
 	}
 }
