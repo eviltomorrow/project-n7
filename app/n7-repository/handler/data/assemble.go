@@ -8,6 +8,7 @@ import (
 	"github.com/eviltomorrow/project-n7/lib/mathutil"
 	"github.com/eviltomorrow/project-n7/lib/model"
 	"github.com/eviltomorrow/project-n7/lib/mysql"
+	"github.com/eviltomorrow/project-n7/lib/snowflake"
 	"github.com/eviltomorrow/project-n7/lib/timeutil"
 )
 
@@ -27,6 +28,7 @@ func AssembleQuoteDay(data *model.Metadata, date time.Time) (*model.Quote, error
 	}
 
 	quote := &model.Quote{
+		Id:              snowflake.Generate().String(),
 		Code:            data.Code,
 		Open:            data.Open,
 		Close:           data.Latest,
@@ -78,6 +80,7 @@ func AssembleQuoteWeek(code string, date time.Time) (*model.Quote, error) {
 	}
 
 	var week = &model.Quote{
+		Id:              snowflake.Generate().String(),
 		Code:            first.Code,
 		Open:            first.Open,
 		Close:           last.Close,

@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/benbjohnson/clock v1.3.0
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/fatih/color v1.14.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1

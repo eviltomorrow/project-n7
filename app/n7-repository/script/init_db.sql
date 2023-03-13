@@ -4,7 +4,7 @@ CREATE DATABASE `n7_repository` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_
 -- create table quote_day
 drop table if exists `n7_repository`.`quote_day`;
 create table `n7_repository`.`quote_day` (
-    `id` BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `id` CHAR(19) NOT NULL PRIMARY KEY,
     `code` CHAR(8) NOT NULL COMMENT '股票代码',
     `open` DECIMAL(10,2) NOT NULL COMMENT '开盘价',
     `close` DECIMAL(10,2) NOT NULL COMMENT '收盘价',
@@ -23,7 +23,7 @@ create index idx_code_date on `n7_repository`.`quote_day`(`code`,`date`);
 
 drop table if exists `n7_repository`.`quote_week`;
 create table `n7_repository`.`quote_week` (
-    `id` BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `id` CHAR(19) NOT NULL PRIMARY KEY,
     `code` CHAR(8) NOT NULL COMMENT '股票代码',
     `open` DECIMAL(10,2) NOT NULL COMMENT '开盘价',
     `close` DECIMAL(10,2) NOT NULL COMMENT '收盘价',

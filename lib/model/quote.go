@@ -8,7 +8,7 @@ import (
 )
 
 type Quote struct {
-	Id              int64        `json:"id"`
+	Id              string       `json:"id"`
 	Code            string       `json:"code"`
 	Open            float64      `json:"open"`
 	Close           float64      `json:"close"`

@@ -25,9 +25,10 @@ func QuoteWithInsertMany(exec mysql.Exec, model string, data []*model.Quote, tim
 	defer cannel()
 
 	var FieldQuotes = make([]string, 0, len(data))
-	var args = make([]interface{}, 0, 11*len(data))
+	var args = make([]interface{}, 0, 12*len(data))
 	for _, m := range data {
-		FieldQuotes = append(FieldQuotes, "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())")
+		FieldQuotes = append(FieldQuotes, "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())")
+		args = append(args, m.Id)
 		args = append(args, m.Code)
 		args = append(args, m.Open)
 		args = append(args, m.Close)
