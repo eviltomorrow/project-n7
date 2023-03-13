@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/snowflake"
-	"github.com/eviltomorrow/project-n7/lib/helper"
 )
 
 var (
@@ -13,15 +12,11 @@ var (
 )
 
 func init() {
-	snowflake.Epoch = helper.Runtime.LaunchTime.UnixNano() / 1e6
-	var (
-		err error
-	)
-
-	node, err = snowflake.NewNode(machineID)
+	n, err := snowflake.NewNode(machineID)
 	if err != nil {
 		panic(fmt.Errorf("snowflake NewNode failure, nest error: %v", err))
 	}
+	node = n
 }
 
 func Generate() snowflake.ID {

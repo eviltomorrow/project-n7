@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/eviltomorrow/project-n7/lib/helper"
 	"github.com/eviltomorrow/project-n7/lib/zlog"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -25,7 +24,7 @@ func InitLogger() error {
 		Format:           "text",
 		DisableTimestamp: false,
 		File: zlog.FileLogConfig{
-			Filename:   filepath.Join(helper.Runtime.RootDir, LogDir, "access.log"),
+			Filename:   filepath.Join(LogDir, "access.log"),
 			MaxSize:    30,
 			MaxDays:    30,
 			MaxBackups: 30,

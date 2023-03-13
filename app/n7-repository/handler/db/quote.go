@@ -298,6 +298,7 @@ const (
 )
 
 var quoteFeilds = []string{
+	FieldQuoteID,
 	FieldQuoteCode,
 	FieldQuoteOpen,
 	FieldQuoteClose,
