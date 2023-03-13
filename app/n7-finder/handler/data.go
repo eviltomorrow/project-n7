@@ -2,10 +2,12 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/eviltomorrow/project-n7/app/n7-finder/handler/calculate"
 	pb "github.com/eviltomorrow/project-n7/lib/grpc/pb/n7-repository"
 	"github.com/eviltomorrow/project-n7/lib/mathutil"
+	jsoniter "github.com/json-iterator/go"
 )
 
 var (
@@ -13,9 +15,17 @@ var (
 )
 
 type Data struct {
-	Quote []*pb.Quote
+	Quote []*pb.Quote `json:"-"`
 
 	Ma10, Ma50, Ma150, Ma200 []float64
+}
+
+func (d *Data) String() string {
+	buf, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(d)
+	if err != nil {
+		return fmt.Sprintf("marshal failure, nest error: %v", err)
+	}
+	return string(buf)
 }
 
 func NewData(quotes []*pb.Quote) (*Data, error) {
